@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { LogOut } from 'lucide-react';
+import { LogOut, AlertCircle } from 'lucide-react';
 import { AuthLayout } from '@/components/layout';
 import { PhoneInput, AssistantAvatar } from '@/components/auth';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { ROUTES } from '@/lib/constants';
 export default function PhonePage() {
   const router = useRouter();
   const [phone, setPhone] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
   const { logout } = useAuthActions();
 
@@ -31,6 +32,7 @@ export default function PhonePage() {
   const handleContinue = async () => {
     if (!isValidPhone || isUpdating) return;
 
+    setError(null);
     const formattedPhone = formatPhoneNumber(phone);
 
     updateUser(
@@ -40,7 +42,12 @@ export default function PhonePage() {
           // User is now active, redirect to hub
           router.replace(ROUTES.HUB);
         },
-        onError: error => {
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            error?.message ||
+            'Failed to update phone number. Please try again.';
+          setError(errorMessage);
           console.error('Failed to update phone number:', error);
         },
       },
@@ -91,7 +98,25 @@ export default function PhonePage() {
           </div>
 
           {/* Phone Input */}
-          <PhoneInput value={phone} onChange={setPhone} />
+          <PhoneInput
+            value={phone}
+            onChange={(value) => {
+              setPhone(value);
+              setError(null);
+            }}
+          />
+
+          {/* Error message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-start gap-3 rounded-lg bg-destructive/10 p-3 text-sm text-destructive"
+            >
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <p>{error}</p>
+            </motion.div>
+          )}
 
           {/* Mobile Avatar */}
           <div className="flex justify-center md:hidden">

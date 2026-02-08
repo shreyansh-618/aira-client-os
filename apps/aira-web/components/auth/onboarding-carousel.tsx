@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Zap, Shield, ArrowRight } from 'lucide-react';
+import { Sparkles, Zap, Shield, ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -52,9 +52,31 @@ export function OnboardingCarousel({ onComplete }: OnboardingCarouselProps) {
     }
   };
 
+  const handlePrev = () => {
+    if (currentSlide > 0) {
+      setCurrentSlide(prev => prev - 1);
+    }
+  };
+
   const handleSkip = () => {
     onComplete();
   };
+
+  // Handle keyboard navigation
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') {
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      } else if (e.key === 'Escape') {
+        handleSkip();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentSlide]);
 
   const slide = slides[currentSlide];
   const Icon = slide.icon;
@@ -125,17 +147,29 @@ export function OnboardingCarousel({ onComplete }: OnboardingCarouselProps) {
           ))}
         </div>
 
-        {/* Action button */}
-        <Button onClick={handleNext} size="lg" className="w-full">
-          {isLastSlide ? (
-            'Get Started'
-          ) : (
-            <>
-              Next
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </>
-          )}
-        </Button>
+        {/* Action buttons */}
+        <div className="flex gap-3">
+          <Button
+            onClick={handlePrev}
+            variant="outline"
+            size="lg"
+            className="w-12"
+            disabled={currentSlide === 0}
+            aria-label="Previous slide"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <Button onClick={handleNext} size="lg" className="flex-1">
+            {isLastSlide ? (
+              'Get Started'
+            ) : (
+              <>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

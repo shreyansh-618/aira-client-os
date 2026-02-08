@@ -29,29 +29,31 @@ function VerifyContent() {
     setIsVerifying(true);
     setError(false);
 
-    // TODO: Verify OTP with API
-    console.log('Verifying OTP:', value);
-
-    // Simulate API call
-    setTimeout(() => {
-      // Simulate success/failure
-      const success = value === '123456'; // Demo: use 123456 as valid OTP
-
-      if (success) {
-        router.push('/name');
-      } else {
-        setError(true);
-        setOtp('');
-        setIsVerifying(false);
-      }
-    }, 1500);
+    try {
+      // TODO: Replace with actual API call when endpoint is available
+      // const response = await api.post('/auth/verify-otp', { otp: value, phone });
+      
+      // For now, this endpoint is not implemented
+      // Simulating the proper error state
+      console.warn('OTP verification endpoint not yet implemented');
+      
+      setError(true);
+      setOtp('');
+      setIsVerifying(false);
+    } catch (err) {
+      console.error('OTP verification failed:', err);
+      setError(true);
+      setOtp('');
+      setIsVerifying(false);
+    }
   };
 
   const handleResend = () => {
     if (resendTimer > 0) return;
 
-    // TODO: Resend OTP
-    console.log('Resending OTP to:', phone);
+    // TODO: Implement resend OTP when API endpoint is available
+    // const response = await api.post('/auth/resend-otp', { phone });
+    console.warn('OTP resend endpoint not yet implemented');
     setResendTimer(30);
   };
 
@@ -124,11 +126,6 @@ function VerifyContent() {
             </button>
           )}
         </div>
-
-        {/* Demo hint */}
-        <p className="text-center text-xs text-muted-foreground">
-          Demo: Enter 123456 to continue
-        </p>
       </motion.div>
     </AuthLayout>
   );
